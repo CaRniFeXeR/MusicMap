@@ -12,16 +12,21 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
     <script src="scripts/queries.js" charset="utf-8"></script>
+    <script src="scripts/d3js_drawer.js" charset="utf-8"></script>
 
     <title>Map My Music</title>
 </head>
 
 <body>
-    {% block content %} {% endblock %}
     <h4>Hi</h4>
 
+    <div id="my_dataviz"></div>
+
     <script>
-        runMapQuery("/api/map_data/playlists.csv")
+        runMapQuery("/api/map_data/playlists.csv").then((data) => {
+            console.log(data)
+            plot_data(data)
+        })
     </script>
 </body>
 
