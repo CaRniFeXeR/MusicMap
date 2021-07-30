@@ -33,6 +33,22 @@ function plot_data(data) {
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
+    // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
+    var zoom = d3.zoom()
+        .scaleExtent([.5, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
+        .extent([[0, 0], [width, height]])
+        .on("zoom", updateChart);
+
+    // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+        .call(zoom);
+    // now the user can zoom and it will trigger the function called updateChart
+
     //add zoom and panning
     // initZoom()
 
@@ -53,19 +69,25 @@ function plot_data(data) {
 
     // Add dots
     var scatter = svg.append('g')
-        .attr("clip-path", "url(#clip)")
+    // .attr("clip-path", "url(#clip)")
 
     scatter_data = scatter
-    .selectAll("circle")
-    .data(data)
-    .enter()
-    
+        .selectAll("circle")
+        .data(data)
+        .enter()
+
     scatter_data
         .append("circle")
         .attr("cx", function (d) { return x(d["0"]); })
         .attr("cy", function (d) { return y(d["1"]); })
         .attr("r", 5.5)
         .style("fill", "#69b3a2")
+        .style("pointer-events", "visible")
+        .on("click", function (d) {
+            // alert("clicked!")
+            console.log("clicked: " + d.name + " " + d.uri)
+            play_song_on_spotify(d.uri)
+        })
 
     scatter_data
         .append("text")
@@ -80,24 +102,7 @@ function plot_data(data) {
         })
         .style("font-size", "14px");
 
-    // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
-    var zoom = d3.zoom()
-        .scaleExtent([.5, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
-        .extent([[0, 0], [width, height]])
-        .on("zoom", updateChart);
 
-    // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
-    svg.append("rect")
-        .attr("width", width)
-        .attr("height", height)
-        .style("fill", "none")
-        .style("pointer-events", "all")
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-        .call(zoom);
-    // now the user can zoom and it will trigger the function called updateChart
-
-    //add zoom and panning
-    // initZoom()
 
     // A function that updates the chart when the user zoom and thus new boundaries are available
     function updateChart() {
@@ -112,12 +117,12 @@ function plot_data(data) {
 
         // update circle position
         scatter
-            .selectAll("circle")            
+            .selectAll("circle")
             .attr('cx', function (d) { return newX(d["0"]) })
             .attr('cy', function (d) { return newY(d["1"]) });
 
         scatter
-            .selectAll("text") 
+            .selectAll("text")
             .attr('x', function (d) { return newX(d["0"]) })
             .attr('y', function (d) { return newY(d["1"]) });
     }

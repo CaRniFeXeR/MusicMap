@@ -48,13 +48,14 @@ if __name__ == "__main__":
         avg_features_list.append(playlist.avg_music_features_values.feature_values + [playlist.name])
         for track in playlist.tracks:
             if not track.name in track_names_set:
-                track_feature_list.append(track.features.feature_values + [track.name])
+                track_feature_list.append(track.features.feature_values + [track.name] + [track.uri])
                 track_names_set.add(track.name)
             else:
                 print(f"canceled '{track.name}' due to duplication")
-
+    
+    #todo add playlist uri
     avg_features_df = pandas.DataFrame(avg_features_list, columns=playlist.avg_music_features_values.feature_names + ["name"])
     avg_features_df.to_csv("playlists.csv")
 
-    avg_features_df = pandas.DataFrame(track_feature_list, columns=playlist.avg_music_features_values.feature_names + ["name"])
+    avg_features_df = pandas.DataFrame(track_feature_list, columns=playlist.avg_music_features_values.feature_names + ["name", "uri"])
     avg_features_df.to_csv("tracks.csv")

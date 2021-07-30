@@ -13,7 +13,7 @@ def embedd_csv(csv_path: str) -> Union[pd.DataFrame, Union[umap.UMAP, pd.DataFra
 
 def embedd_data(song_data: pd.DataFrame) -> Union[umap.UMAP, pd.DataFrame]:
 
-    song_data_scaled = preprocessing.StandardScaler().fit_transform(song_data.loc[:, song_data.columns != "name"])
+    song_data_scaled = preprocessing.StandardScaler().fit_transform(song_data.loc[:, song_data.columns.difference(["name", "uri"])])
     mapper = umap.UMAP().fit(song_data_scaled)
     song_data_transformed = mapper.transform(song_data_scaled)
 
