@@ -55,15 +55,29 @@ function plot_data(data) {
     var scatter = svg.append('g')
         .attr("clip-path", "url(#clip)")
 
-    scatter
-        .selectAll("circle")
-        .data(data)
-        .enter()
+    scatter_data = scatter
+    .selectAll("circle")
+    .data(data)
+    .enter()
+    
+    scatter_data
         .append("circle")
         .attr("cx", function (d) { return x(d["0"]); })
         .attr("cy", function (d) { return y(d["1"]); })
-        .attr("r", 1.5)
+        .attr("r", 25.5)
         .style("fill", "#69b3a2")
+
+    scatter_data
+        .append("text")
+        .text(function (d) {
+            return d.name;
+        })
+        .attr("x", function (d) {
+            return x(d["0"]);
+        })
+        .attr("y", function (d) {
+            return y(d["1"]);
+        });
 
     // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
     var zoom = d3.zoom()
@@ -97,8 +111,13 @@ function plot_data(data) {
 
         // update circle position
         scatter
-            .selectAll("circle")
+            .selectAll("circle")            
             .attr('cx', function (d) { return newX(d["0"]) })
             .attr('cy', function (d) { return newY(d["1"]) });
+
+        scatter
+            .selectAll("text") 
+            .attr('x', function (d) { return newX(d["0"]) })
+            .attr('y', function (d) { return newY(d["1"]) });
     }
 }
