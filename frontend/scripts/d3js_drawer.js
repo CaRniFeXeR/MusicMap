@@ -64,7 +64,7 @@ function plot_data(data) {
         .append("circle")
         .attr("cx", function (d) { return x(d["0"]); })
         .attr("cy", function (d) { return y(d["1"]); })
-        .attr("r", 25.5)
+        .attr("r", 5.5)
         .style("fill", "#69b3a2")
 
     scatter_data
@@ -77,7 +77,8 @@ function plot_data(data) {
         })
         .attr("y", function (d) {
             return y(d["1"]);
-        });
+        })
+        .style("font-size", "14px");
 
     // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
     var zoom = d3.zoom()
