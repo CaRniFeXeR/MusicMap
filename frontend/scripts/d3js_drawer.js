@@ -18,14 +18,16 @@ function plot_data(data) {
 
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 30, left: 60 },
-        width = 1000 - margin.left - margin.right,
-        height = 700 - margin.top - margin.bottom;
+        width = "95vw",
+        height = "80vh";
+    client_width = document.documentElement.clientWidth;
+    client_height = document.documentElement.clientHeight;
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", width)
+        .attr("height", height)
         // .call(d3.zoom().on("zoom", function () {
         //     svg.attr("transform", d3.event.transform)
         //  }))
@@ -35,8 +37,8 @@ function plot_data(data) {
 
     // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
     var zoom = d3.zoom()
-        .scaleExtent([.5, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
-        .extent([[0, 0], [width, height]])
+        .scaleExtent([.1, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
+        // .extent([[0, 0], [width, height]])
         .on("zoom", updateChart);
 
     // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
@@ -55,15 +57,15 @@ function plot_data(data) {
     // Add X axis
     var x = d3.scaleLinear()
         .domain([4, 8])
-        .range([0, width]);
+        .range([0, client_width]);
     var xAxis = svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + client_height + ")")
         .call(d3.axisBottom(x));
 
     // Add Y axis
     var y = d3.scaleLinear()
         .domain([0, 9])
-        .range([height, 0]);
+        .range([client_height, 0]);
     var yAxis = svg.append("g")
         .call(d3.axisLeft(y));
 
