@@ -4,3 +4,12 @@
 circle:hover {
     cursor: pointer;
 }
+
+
+text {
+    fill:#b3b3b3;
+}
+
+text:hover {
+    fill:white
+}

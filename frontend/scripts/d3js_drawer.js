@@ -83,7 +83,7 @@ function plot_data(data) {
         .attr("cx", function (d) { return x(d["0"]); })
         .attr("cy", function (d) { return y(d["1"]); })
         .attr("r", 7.5)
-        .style("fill", "#69b3a2")
+        .style("fill", "#1ed760")
         .style("pointer-events", "visible")
         .on("click", function (d) {
             // alert("clicked!")

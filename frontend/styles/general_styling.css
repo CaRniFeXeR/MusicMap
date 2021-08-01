@@ -2,5 +2,14 @@ body,
 input {
  color:#b3b3b3;
  font-family:spotify-circular,spotify-circular-cyrillic,spotify-circular-arabic,spotify-circular-hebrew,Helvetica Neue,helvetica,arial,Hiragino Kaku Gothic Pro,Meiryo,MS Gothic,sans-serif;
- text-transform:none
+ text-transform:none;
 }
+
+body {
+ background-color : #1e1e1e;
+
+}
+
+/* text {
+    color: #f5f5f5
+} */
