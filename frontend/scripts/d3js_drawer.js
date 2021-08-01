@@ -36,7 +36,7 @@ function plot_data(data) {
             "translate(" + margin.left + "," + margin.top + ")");
 
     // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
-    var zoom = d3.zoom()
+    zoom = d3.zoom()
         .scaleExtent([.1, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
         // .extent([[0, 0], [width, height]])
         .on("zoom", updateChart);
@@ -111,6 +111,11 @@ function plot_data(data) {
     // A function that updates the chart when the user zoom and thus new boundaries are available
     function updateChart() {
 
+        current_zoom_level = d3.event.transform.k
+        console.log("zoom factor " + current_zoom_level)
+
+        let display_text = current_zoom_level <= 1.5 ? "none" : "block"
+
         // recover the new scale
         var newX = d3.event.transform.rescaleX(x);
         var newY = d3.event.transform.rescaleY(y);
@@ -128,18 +133,21 @@ function plot_data(data) {
         scatter
             .selectAll("text")
             .attr('x', function (d) { return newX(d["0"]) })
-            .attr('y', function (d) { return newY(d["1"]) });
+            .attr('y', function (d) { return newY(d["1"]) })
+            .style("display", display_text);
+
+
     }
 
     //transitions
 
-    function handleMouseOver(d, i) {       
+    function handleMouseOver(d, i) {
         d3.select(this).transition()
             .duration(1)
             .attr("r", 12);
     }
-    
-    function handleMouseOut(d, i) {   
+
+    function handleMouseOut(d, i) {
         d3.select(this).transition()
             .duration(1)
             .attr("r", 7.5);
