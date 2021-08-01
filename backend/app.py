@@ -19,6 +19,11 @@ def index():
 def send_scripts(path : str):
    return send_from_directory('..\\frontend\\scripts', path)
 
+#todo make save
+@app.route('/styles/<path:path>')
+def send_styles(path : str):
+   return send_from_directory('..\\frontend\\styles', path)
+
 @app.route('/dist/<path:path>')
 def send_dist(path):
     return send_from_directory('dist', path)

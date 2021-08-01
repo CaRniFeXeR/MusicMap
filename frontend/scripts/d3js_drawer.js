@@ -82,7 +82,7 @@ function plot_data(data) {
         .append("circle")
         .attr("cx", function (d) { return x(d["0"]); })
         .attr("cy", function (d) { return y(d["1"]); })
-        .attr("r", 5.5)
+        .attr("r", 7.5)
         .style("fill", "#69b3a2")
         .style("pointer-events", "visible")
         .on("click", function (d) {
@@ -90,6 +90,8 @@ function plot_data(data) {
             console.log("clicked: " + d.name + " " + d.uri)
             play_song_on_spotify(d.uri)
         })
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut);
 
     scatter_data
         .append("text")
@@ -127,5 +129,19 @@ function plot_data(data) {
             .selectAll("text")
             .attr('x', function (d) { return newX(d["0"]) })
             .attr('y', function (d) { return newY(d["1"]) });
+    }
+
+    //transitions
+
+    function handleMouseOver(d, i) {       
+        d3.select(this).transition()
+            .duration(1)
+            .attr("r", 12);
+    }
+    
+    function handleMouseOut(d, i) {   
+        d3.select(this).transition()
+            .duration(1)
+            .attr("r", 7.5);
     }
 }
