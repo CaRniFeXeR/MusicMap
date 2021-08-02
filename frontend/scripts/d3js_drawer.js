@@ -133,7 +133,13 @@ function plot_data(data) {
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut)
         .classed("song", function (d) { return d.type == "song" })
-        .classed("playlist", function (d) { return d.type == "playlist" });
+        .classed("playlist", function (d) { return d.type == "playlist" })
+        .on("click", function (d) {
+            // alert("clicked!")
+            if (d.type == "song") {
+                console.log("clicked: " + d.name + " " + d.uri)
+            }
+        });
 
     scatter_data
         .append("text")
@@ -145,16 +151,11 @@ function plot_data(data) {
         })
         .attr("y", function (d) {
             return y(d["1"]);
-        })
+        })       
         .style("font-size", "14px")
         .classed("song_text", function (d) { return d.type == "song" })
         .classed("playlist_text", function (d) { return d.type == "playlist" })
-        .on("click", function (d) {
-            // alert("clicked!")
-            if (d.type == "song") {
-                console.log("clicked: " + d.name + " " + d.uri)
-            }
-        });
+
 
     // scatter.selectAll(".song").transition()
     //     .style("#1ed760")
