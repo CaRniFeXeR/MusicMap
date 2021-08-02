@@ -28,6 +28,7 @@
         if (authenticate_if_needed()) {
             runMapQuery("/api/map_data/tracks.csv").then((data) => {
                 console.log(data)
+                init_d3_svg()
                 plot_data(data)
             })
         }
