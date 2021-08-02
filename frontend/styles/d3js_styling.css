@@ -5,6 +5,13 @@ circle:hover {
     cursor: pointer;
 }
 
+circle.song{
+    fill: #1ed760
+}
+
+circle.playlist{
+    fill: #561bf8
+}
 
 text {
     fill:#b3b3b3;

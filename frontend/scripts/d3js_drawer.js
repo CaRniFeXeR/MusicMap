@@ -39,7 +39,7 @@ function init_d3_svg() {
     zoom = d3.zoom()
         .scaleExtent([.1, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
         // .extent([[0, 0], [width, height]])
-        .on("zoom", updateChart);
+        .on("zoom", updateMap);
 
     // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
     svg.append("rect")
@@ -49,7 +49,7 @@ function init_d3_svg() {
         .style("pointer-events", "all")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .call(zoom);
-    // now the user can zoom and it will trigger the function called updateChart
+    // now the user can zoom and it will trigger the function called updateMap
 
     //add zoom and panning
     // initZoom()
@@ -74,7 +74,7 @@ function init_d3_svg() {
 }
 
 // A function that updates the chart when the user zoom and thus new boundaries are available
-function updateChart() {
+function updateMap() {
 
     current_zoom_level = d3.event.transform.k
     console.log("zoom factor " + current_zoom_level)
@@ -99,6 +99,9 @@ function updateChart() {
         .selectAll("text")
         .attr('x', function (d) { return newX(d["0"]) })
         .attr('y', function (d) { return newY(d["1"]) })
+
+    scatter
+        .selectAll("text.song_text")
         .style("display", display_text);
 
 
@@ -126,15 +129,11 @@ function plot_data(data) {
         .attr("cx", function (d) { return x(d["0"]); })
         .attr("cy", function (d) { return y(d["1"]); })
         .attr("r", 7.5)
-        .style("fill", "#1ed760")
         .style("pointer-events", "visible")
-        .on("click", function (d) {
-            // alert("clicked!")
-            console.log("clicked: " + d.name + " " + d.uri)
-            play_song_on_spotify(d.uri)
-        })
         .on("mouseover", handleMouseOver)
-        .on("mouseout", handleMouseOut);
+        .on("mouseout", handleMouseOut)
+        .classed("song", function (d) { return d.type == "song" })
+        .classed("playlist", function (d) { return d.type == "playlist" });
 
     scatter_data
         .append("text")
@@ -147,7 +146,32 @@ function plot_data(data) {
         .attr("y", function (d) {
             return y(d["1"]);
         })
-        .style("font-size", "14px");
+        .style("font-size", "14px")
+        .classed("song_text", function (d) { return d.type == "song" })
+        .classed("playlist_text", function (d) { return d.type == "playlist" })
+        .on("click", function (d) {
+            // alert("clicked!")
+            if (d.type == "song") {
+                console.log("clicked: " + d.name + " " + d.uri)
+            }
+        });
+
+    // scatter.selectAll(".song").transition()
+    //     .style("#1ed760")
+    //     .on("click", function (d) {
+    //         // alert("clicked!")
+    //         console.log("clicked: " + d.name + " " + d.uri)
+    //         play_song_on_spotify(d.uri)
+    //     });
+
+    // scatter.selectAll(".playlist").transition()
+    //     .style("#5e03fc")
+    //     .on("click", function (d) {
+    //         // alert("clicked!")
+    //         console.log("clicked playlist: " + d.name)
+    //     });
+
+
 
 }
 

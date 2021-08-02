@@ -1,5 +1,5 @@
 import pandas as pd
-from songembedding import embedd_csv
+from songembedding import embedd_csv, embedd_combined_data
 from flask import Flask, request, send_from_directory, jsonify
 
 
@@ -13,30 +13,41 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 @app.route('/')
 @app.route('/index')
 def index():
-   return send_from_directory('..\\frontend\\', "map.html")
+    return send_from_directory('..\\frontend\\', "map.html")
+
 
 @app.route('/scripts/<path:path>')
-def send_scripts(path : str):
-   return send_from_directory('..\\frontend\\scripts', path)
+def send_scripts(path: str):
+    return send_from_directory('..\\frontend\\scripts', path)
 
-#todo make save
+# todo make save
+
+
 @app.route('/styles/<path:path>')
-def send_styles(path : str):
-   return send_from_directory('..\\frontend\\styles', path)
+def send_styles(path: str):
+    return send_from_directory('..\\frontend\\styles', path)
+
 
 @app.route('/dist/<path:path>')
 def send_dist(path):
     return send_from_directory('dist', path)
 
 
-@app.route("/api/map_data/<csv_path>")
-def get_map_data(csv_path: str):
-    csv_path = "../" + csv_path
-    print(f"get_map_data {csv_path}")
-    data_df, (mapper, data_embedded) = embedd_csv(csv_path)
+@app.route("/api/map_data/<csv_path_songs>")
+def get_map_data(csv_path_songs: str):
+    csv_path_playlists = "playlists.csv"
+    csv_path_songs = "../" + csv_path_songs
+    csv_path_playlists = "../" + csv_path_playlists
+    print(f"get_map_data songs: '{csv_path_songs}'")
+    data_df, (mapper, data_embedded) = embedd_combined_data(csv_path_songs, csv_path_playlists)
 
-    data_combined_df = pd.concat([data_df, pd.DataFrame(data_embedded)], axis=1)
+    print("successfully generated UMAP")
 
-    print(f"concatenated data from {csv_path}")
+    data_combined_df = pd.concat([data_df.reset_index(), pd.DataFrame(data_embedded)], axis=1)
+    data_combined_df.pop("Unnamed: 0")
+    data_combined_df.pop("level_1")
+    data_combined_df.rename(columns={"level_0": "type"}, inplace=True)
+
+    print(f"concatenated data from '{csv_path_songs}' and '{csv_path_playlists}'")
 
     return jsonify(data_combined_df.to_json(orient="index"))
