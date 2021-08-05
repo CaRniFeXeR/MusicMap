@@ -41,14 +41,7 @@
     <script>
         if (authenticate_if_needed()) {
             init_d3_svg()
-            load_data([])
-        }
-
-        function load_data(removed_features) {
-            embedd_data("../tracks.csv", "../playlists.csv", removed_features).then((data) => {
-                console.log(data)
-                plot_data(data)
-            })
+            load_data()
         }
 
     </script>
