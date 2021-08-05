@@ -10,10 +10,11 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
     <script src="scripts/queries.js" charset="utf-8"></script>
     <script src="scripts/d3js_drawer.js" charset="utf-8"></script>
     <script src="scripts/spotify_playback.js" charset="utf-8"></script>
+    <script src="scripts/data_manager.js" charset="utf-8"></script>
 
     <title>Map My Music</title>
 </head>
@@ -21,14 +22,31 @@
 <body>
     <h4>Map My Music</h4>
 
+    <div id=tool_bar>
+        <ul>
+            <li onclick="change_selected_features('danceability')">Danceability</li>
+            <li onclick="change_selected_features('energy')">Energy</li>
+            <li onclick="change_selected_features('loudness')">Loudness</li>
+            <li onclick="change_selected_features('speechiness')">Speechiness</li>
+            <li onclick="change_selected_features('acousticness')">Acousticness</li>
+            <li onclick="change_selected_features('instrumentalness')">Instrumentalness</li>
+            <li onclick="change_selected_features('liveness')">Liveness</li>
+            <li onclick="change_selected_features('valence')">Valence</li>
+            <li onclick="change_selected_features('tempo')">Tempo</li>
+        </ul>
+    </div>
     <div id="my_dataviz">
     </div>
 
     <script>
         if (authenticate_if_needed()) {
-            runMapQuery("api/map_data/tracks.csv").then((data) => {
+            init_d3_svg()
+            load_data([])
+        }
+
+        function load_data(removed_features) {
+            embedd_data("../tracks.csv", "../playlists.csv", removed_features).then((data) => {
                 console.log(data)
-                init_d3_svg()
                 plot_data(data)
             })
         }

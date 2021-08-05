@@ -1,6 +1,5 @@
 from typing import List, Union
 import pandas as pd
-from pandas.core.frame import DataFrame
 from sklearn import preprocessing
 import umap
 import umap.plot
@@ -11,14 +10,25 @@ def embedd_csv(csv_path: str) -> Union[pd.DataFrame, Union[umap.UMAP, pd.DataFra
     return song_data, embedd_data(song_data)
 
 
-def embedd_combined_data(csv_songs: str, csv_playlists: str, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
-
-    song_data = pd.read_csv(csv_songs)
+def embedd_combined_data_from_csv(csv_tracks: str, csv_playlists: str, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
+    song_data = pd.read_csv(csv_tracks)
     playlist_data = pd.read_csv(csv_playlists)
 
-    combined_df = pd.concat([song_data, playlist_data], keys=["song", "playlist"])
+    return embedd_combined_data(song_data, playlist_data, removed_columns)
 
-    return combined_df, embedd_data(combined_df, removed_columns)
+
+def embedd_combined_data(song_data: pd.DataFrame, playlist_data: pd.DataFrame, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
+
+    data_df = pd.concat([song_data, playlist_data], keys=["song", "playlist"])
+
+    mapper, data_embedded = embedd_data(data_df, removed_columns)
+
+    data_combined_df = pd.concat([data_df.reset_index(), pd.DataFrame(data_embedded)], axis=1)
+    data_combined_df.pop("Unnamed: 0")
+    data_combined_df.pop("level_1")
+    data_combined_df.rename(columns={"level_0": "type"}, inplace=True)
+
+    return data_combined_df
 
 
 def embedd_data(song_data: pd.DataFrame, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
