@@ -1,4 +1,4 @@
-var svg, xAxis, yAxis, x, y, scaled_x, scaled_y, scatter, scatter_text, std_transitation = "";
+var svg, xAxis, yAxis, x, y, scaled_x, scaled_y, scatter, scatter_text, std_transitation, data_size, last_zoom_level = "";
 const TRANSITION_DURATION = 4000;
 const CIRCLE_STD_RADIUS = 7.5;
 const CIRCLE_HIGHLIGHT_RADIUS = 12;
@@ -79,10 +79,8 @@ function init_d3_svg() {
 // A function that updates the chart when the user zoom and thus new boundaries are available
 function updatePositionOnZoom() {
 
-    current_zoom_level = d3.event.transform.k
-    console.log("zoom factor " + current_zoom_level)
+    var current_zoom_level = d3.event.transform.k
 
-    let display_text = current_zoom_level <= 2.5 ? "none" : "block"
 
     // recover the new scale
     scaled_x = d3.event.transform.rescaleX(x);
@@ -103,9 +101,39 @@ function updatePositionOnZoom() {
         .attr('x', function (d) { return scaled_x(d["0"]) })
         .attr('y', function (d) { return scaled_y(d["1"]) })
 
-    scatter
-        .selectAll("text.song_text")
-        .style("display", display_text);
+    if (current_zoom_level != last_zoom_level) {
+
+        last_zoom_level = current_zoom_level
+        console.log(current_zoom_level)
+        var zoom_level_scaled = (current_zoom_level - 0.1) / (3.5)
+        zoom_level_scaled = Math.min(Math.max(zoom_level_scaled, 0), 1)
+
+        // // let display_text = current_zoom_level <= 2.5 ? "none" : "block"
+
+        // // zoom_filter_value = data_size - Math.floor(zoom_level_scaled * data_size) + 1
+        var value = zoom_level_scaled
+        var base = 2
+        var loged = Math.log(value + 1) / Math.log(base)
+        // var loged = 1
+        zoom_filter_value = data_size - Math.floor(loged * data_size) + 1
+
+        console.log("zoom factor " + current_zoom_level + " loged: " + loged + "zoom factor filter value: " + zoom_filter_value)
+
+        scatter
+            .selectAll("text.song_text")
+            .style("display", function (d) {
+                // console.log("index: " + d.index + " zoomFilterValue: " + zoom_filter_value)
+                // return d.index % zoom_filter_value == 0 ? "block" : "none"
+                if (d.index + 1 >= zoom_filter_value) {
+                    // console.log("index: " + d.index + " zoom_filter_value: " + zoom_filter_value)
+                    return "block"
+                } else {
+                    return "none"
+                }
+            });
+
+    }
+
 
 
 }
@@ -120,6 +148,8 @@ function plot_playlists() {
 }
 
 function plot_data(data) {
+
+    data_size = data.length
 
     scatter_circles = scatter
         .selectAll("circle")
@@ -178,8 +208,8 @@ function draw_data() {
                 }),
             update => update
                 .call(update => update.transition(std_transitationFactory())
-                    .attr("y", function (d) { return y(d["1"]); })
-                    .attr("x", function (d) { return x(d["0"]); })
+                    .attr("x", function (d) { return scaled_x(d["0"]); })
+                    .attr("y", function (d) { return scaled_y(d["0"]); })
                 )
         )
         .style("font-size", "14px")

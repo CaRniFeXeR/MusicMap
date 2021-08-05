@@ -19,7 +19,7 @@ def embedd_combined_data_from_csv(csv_tracks: str, csv_playlists: str, removed_c
 
 def embedd_combined_data(song_data: pd.DataFrame, playlist_data: pd.DataFrame, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
 
-    data_df = pd.concat([song_data, playlist_data], keys=["song", "playlist"])
+    data_df = pd.concat([song_data, playlist_data], keys=["song", "playlist"]).sample(frac=1)
 
     mapper, data_embedded = embedd_data(data_df, removed_columns)
 
@@ -27,6 +27,7 @@ def embedd_combined_data(song_data: pd.DataFrame, playlist_data: pd.DataFrame, r
     data_combined_df.pop("Unnamed: 0")
     data_combined_df.pop("level_1")
     data_combined_df.rename(columns={"level_0": "type"}, inplace=True)
+    data_combined_df = data_combined_df.reset_index()
 
     return data_combined_df
 
