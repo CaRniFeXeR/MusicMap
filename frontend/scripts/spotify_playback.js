@@ -55,3 +55,46 @@ function play_song_on_spotify(song_uri) {
             console.error('Error:', error);
         });
 }
+
+function next_song_on_spotify() {
+
+    return fetch("https://api.spotify.com/v1/me/player/next", {
+        method: "POST",
+        cache: "no-cache",
+        headers: new Headers({
+            "content-type": "application/json",
+            "authorization": `Bearer ${current_token}`
+        }),
+        body: ``
+    }).then(response => response.json())
+        .then(data => {
+            console.log("successfully played song")
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+}
+
+function queue_song_on_spotify(song_uri) {
+    current_token = localStorage["access_token"]
+
+    return fetch(`https://api.spotify.com/v1/me/player/queue?uri=${song_uri}`, {
+        method: "POST",
+        cache: "no-cache",
+        headers: new Headers({
+            "content-type": "application/json",
+            "authorization": `Bearer ${current_token}`
+        }),
+        body: "",
+    }).then(response => {
+        console.log("successfully queued")
+        next_song_on_spotify().then(() => {
+            console.log("successfully played next song")
+        })
+    })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+

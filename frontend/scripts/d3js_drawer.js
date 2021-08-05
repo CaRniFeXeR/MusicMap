@@ -105,7 +105,7 @@ function updatePositionOnZoom() {
 
         last_zoom_level = current_zoom_level
         console.log(current_zoom_level)
-        var zoom_level_scaled = (current_zoom_level - 0.1) / (3.5)
+        var zoom_level_scaled = (current_zoom_level - 0.3) / (3.5)
         zoom_level_scaled = Math.min(Math.max(zoom_level_scaled, 0), 1)
 
         // // let display_text = current_zoom_level <= 2.5 ? "none" : "block"
@@ -190,7 +190,8 @@ function draw_data() {
             // alert("clicked!")
             if (d.type == "song") {
                 console.log("clicked: " + d.name + " " + d.uri)
-                play_song_on_spotify(d.uri)
+                // play_song_on_spotify(d.uri)
+                queue_song_on_spotify(d.uri)
             }
         });
 
