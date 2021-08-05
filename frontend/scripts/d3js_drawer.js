@@ -1,5 +1,7 @@
-var svg, xAxis, yAxis, x, y, scatter = "";
-
+var svg, xAxis, yAxis, x, y, scaled_x, scaled_y, scatter, scatter_text, std_transitation = "";
+const TRANSITION_DURATION = 8000;
+const CIRCLE_STD_RADIUS = 7.5;
+const CIRCLE_HIGHLIGHT_RADIUS = 12;
 
 function handleZoom() {
     console.log("handle zoom")
@@ -39,7 +41,7 @@ function init_d3_svg() {
     zoom = d3.zoom()
         .scaleExtent([.1, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
         // .extent([[0, 0], [width, height]])
-        .on("zoom", updateMap);
+        .on("zoom", updatePositionOnZoom);
 
     // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
     svg.append("rect")
@@ -49,15 +51,13 @@ function init_d3_svg() {
         .style("pointer-events", "all")
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
         .call(zoom);
-    // now the user can zoom and it will trigger the function called updateMap
-
-    //add zoom and panning
-    // initZoom()
+    // now the user can zoom and it will trigger the function called updatePositionOnZoom
 
     // Add X axis
     x = d3.scaleLinear()
         .domain([4, 8])
         .range([0, client_width]);
+    scaled_x = x;
     xAxis = svg.append("g")
         .attr("transform", "translate(0," + client_height + ")")
         .call(d3.axisBottom(x));
@@ -66,15 +66,18 @@ function init_d3_svg() {
     y = d3.scaleLinear()
         .domain([0, 9])
         .range([client_height, 0]);
+    scaled_y = y;
     yAxis = svg.append("g")
         .call(d3.axisLeft(y));
 
     scatter = svg.append('g')
 
+    std_transitation = svg.transition().duration(TRANSITION_DURATION); //.ease(d3.easeQuadInOut);
+
 }
 
 // A function that updates the chart when the user zoom and thus new boundaries are available
-function updateMap() {
+function updatePositionOnZoom() {
 
     current_zoom_level = d3.event.transform.k
     console.log("zoom factor " + current_zoom_level)
@@ -82,23 +85,23 @@ function updateMap() {
     let display_text = current_zoom_level <= 2.5 ? "none" : "block"
 
     // recover the new scale
-    var newX = d3.event.transform.rescaleX(x);
-    var newY = d3.event.transform.rescaleY(y);
+    scaled_x = d3.event.transform.rescaleX(x);
+    scaled_y = d3.event.transform.rescaleY(y);
 
     // update axes with these new boundaries
-    xAxis.call(d3.axisBottom(newX))
-    yAxis.call(d3.axisLeft(newY))
+    xAxis.call(d3.axisBottom(scaled_x))
+    yAxis.call(d3.axisLeft(scaled_y))
 
     // update circle position
     scatter
         .selectAll("circle")
-        .attr('cx', function (d) { return newX(d["0"]) })
-        .attr('cy', function (d) { return newY(d["1"]) });
+        .attr('cx', function (d) { return scaled_x(d["0"]) })
+        .attr('cy', function (d) { return scaled_y(d["1"]) });
 
     scatter
         .selectAll("text")
-        .attr('x', function (d) { return newX(d["0"]) })
-        .attr('y', function (d) { return newY(d["1"]) })
+        .attr('x', function (d) { return scaled_x(d["0"]) })
+        .attr('y', function (d) { return scaled_y(d["1"]) })
 
     scatter
         .selectAll("text.song_text")
@@ -118,17 +121,36 @@ function plot_playlists() {
 
 function plot_data(data) {
 
-
-    scatter_data = scatter
+    scatter_circles = scatter
         .selectAll("circle")
-        .data(data)
-        .enter()
+        .data(data, function (d) { return d.uri })
 
-    scatter_data
-        .append("circle")
-        .attr("cx", function (d) { return x(d["0"]); })
-        .attr("cy", function (d) { return y(d["1"]); })
-        .attr("r", 7.5)
+    scatter_text = scatter
+        .selectAll("text")
+        .data(data, function (d) { return d.uri })
+
+    draw_data()
+}
+
+function replot_data(data) {
+    plot_data(data)
+}
+
+function draw_data() {
+
+    scatter_circles
+        .join(
+            enter => enter.append("circle")
+                .attr("cx", function (d) { return scaled_x(d["0"]); })
+                .attr("cy", function (d) { return scaled_y(d["1"]); })
+                .attr("r", CIRCLE_STD_RADIUS),
+            update => update
+                .call(update => update.transition(std_transitation)
+                    .attr("cx", function (d) { return scaled_x(d["0"]); })
+                    .attr("cy", function (d) { return scaled_y(d["1"]); })
+
+                )
+        )
         .style("pointer-events", "visible")
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut)
@@ -138,42 +160,31 @@ function plot_data(data) {
             // alert("clicked!")
             if (d.type == "song") {
                 console.log("clicked: " + d.name + " " + d.uri)
+                play_song_on_spotify(d.uri)
             }
         });
 
-    scatter_data
-        .append("text")
-        .text(function (d) {
-            return d.name;
-        })
-        .attr("x", function (d) {
-            return x(d["0"]);
-        })
-        .attr("y", function (d) {
-            return y(d["1"]);
-        })       
+    scatter_text
+        .join(
+            enter => enter.append("text")
+                .text(function (d) {
+                    return d.name;
+                })
+                .attr("x", function (d) {
+                    return x(d["0"]);
+                })
+                .attr("y", function (d) {
+                    return y(d["1"]);
+                }),
+            update => update
+                .call(update => update.transition(std_transitation)
+                    .attr("y", function (d) { return y(d["1"]); })
+                    .attr("x", function (d) { return x(d["0"]); })
+                )
+        )
         .style("font-size", "14px")
         .classed("song_text", function (d) { return d.type == "song" })
         .classed("playlist_text", function (d) { return d.type == "playlist" })
-
-
-    // scatter.selectAll(".song").transition()
-    //     .style("#1ed760")
-    //     .on("click", function (d) {
-    //         // alert("clicked!")
-    //         console.log("clicked: " + d.name + " " + d.uri)
-    //         play_song_on_spotify(d.uri)
-    //     });
-
-    // scatter.selectAll(".playlist").transition()
-    //     .style("#5e03fc")
-    //     .on("click", function (d) {
-    //         // alert("clicked!")
-    //         console.log("clicked playlist: " + d.name)
-    //     });
-
-
-
 }
 
 //transitions
@@ -181,11 +192,11 @@ function plot_data(data) {
 function handleMouseOver(d, i) {
     d3.select(this).transition()
         .duration(1)
-        .attr("r", 12);
+        .attr("r", CIRCLE_HIGHLIGHT_RADIUS);
 }
 
 function handleMouseOut(d, i) {
     d3.select(this).transition()
         .duration(1)
-        .attr("r", 7.5);
+        .attr("r", CIRCLE_STD_RADIUS);
 }

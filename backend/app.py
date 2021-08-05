@@ -51,3 +51,23 @@ def get_map_data(csv_path_songs: str):
     print(f"concatenated data from '{csv_path_songs}' and '{csv_path_playlists}'")
 
     return jsonify(data_combined_df.to_json(orient="index"))
+
+
+@app.route("/api/map_data_od/<csv_path_songs>")
+def get_map_data_od(csv_path_songs: str):
+    csv_path_playlists = "playlists.csv"
+    csv_path_songs = "../" + csv_path_songs
+    csv_path_playlists = "../" + csv_path_playlists
+    print(f"get_map_data songs: '{csv_path_songs}'")
+    data_df, (mapper, data_embedded) = embedd_combined_data(csv_path_songs, csv_path_playlists, removed_columns=["danceability", "energy"])
+
+    print("successfully generated UMAP")
+
+    data_combined_df = pd.concat([data_df.reset_index(), pd.DataFrame(data_embedded)], axis=1)
+    data_combined_df.pop("Unnamed: 0")
+    data_combined_df.pop("level_1")
+    data_combined_df.rename(columns={"level_0": "type"}, inplace=True)
+
+    print(f"concatenated data from '{csv_path_songs}' and '{csv_path_playlists}'")
+
+    return jsonify(data_combined_df.to_json(orient="index"))

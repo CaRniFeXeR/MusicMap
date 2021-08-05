@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 import pandas as pd
 from pandas.core.frame import DataFrame
 from sklearn import preprocessing
@@ -11,19 +11,19 @@ def embedd_csv(csv_path: str) -> Union[pd.DataFrame, Union[umap.UMAP, pd.DataFra
     return song_data, embedd_data(song_data)
 
 
-def embedd_combined_data(csv_songs: str, csv_playlists: str):
+def embedd_combined_data(csv_songs: str, csv_playlists: str, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
 
     song_data = pd.read_csv(csv_songs)
     playlist_data = pd.read_csv(csv_playlists)
 
     combined_df = pd.concat([song_data, playlist_data], keys=["song", "playlist"])
 
-    return combined_df, embedd_data(combined_df)
+    return combined_df, embedd_data(combined_df, removed_columns)
 
 
-def embedd_data(song_data: pd.DataFrame) -> Union[umap.UMAP, pd.DataFrame]:
+def embedd_data(song_data: pd.DataFrame, removed_columns: List[str] = []) -> Union[umap.UMAP, pd.DataFrame]:
 
-    song_data_scaled = preprocessing.StandardScaler().fit_transform(song_data.loc[:, song_data.columns.difference(["name", "uri"])])
+    song_data_scaled = preprocessing.StandardScaler().fit_transform(song_data.loc[:, song_data.columns.difference(["name", "uri"] + removed_columns)])
     mapper = umap.UMAP().fit(song_data_scaled)
     song_data_transformed = mapper.transform(song_data_scaled)
 
