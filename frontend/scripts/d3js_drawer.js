@@ -1,5 +1,5 @@
 var svg, xAxis, yAxis, x, y, scaled_x, scaled_y, scatter, scatter_text, std_transitation = "";
-const TRANSITION_DURATION = 8000;
+const TRANSITION_DURATION = 4000;
 const CIRCLE_STD_RADIUS = 7.5;
 const CIRCLE_HIGHLIGHT_RADIUS = 12;
 
@@ -72,7 +72,7 @@ function init_d3_svg() {
 
     scatter = svg.append('g')
 
-    std_transitation = svg.transition().duration(TRANSITION_DURATION); //.ease(d3.easeQuadInOut);
+    std_transitationFactory = () => svg.transition().duration(TRANSITION_DURATION).ease(d3.easeQuadInOut);
 
 }
 
@@ -145,7 +145,7 @@ function draw_data() {
                 .attr("cy", function (d) { return scaled_y(d["1"]); })
                 .attr("r", CIRCLE_STD_RADIUS),
             update => update
-                .call(update => update.transition(std_transitation)
+                .call(update => update.transition(std_transitationFactory())
                     .attr("cx", function (d) { return scaled_x(d["0"]); })
                     .attr("cy", function (d) { return scaled_y(d["1"]); })
 
@@ -177,7 +177,7 @@ function draw_data() {
                     return y(d["1"]);
                 }),
             update => update
-                .call(update => update.transition(std_transitation)
+                .call(update => update.transition(std_transitationFactory())
                     .attr("y", function (d) { return y(d["1"]); })
                     .attr("x", function (d) { return x(d["0"]); })
                 )

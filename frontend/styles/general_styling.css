@@ -12,6 +12,12 @@ body {
 
 #tool_bar ul li {
     display: inline-block;
+    transition: 0.2s;
+}
+#tool_bar ul li:hover {
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
 }
 
 /* text {
