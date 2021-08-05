@@ -1,4 +1,4 @@
-var svg, xAxis, yAxis, x, y, scaled_x, scaled_y, scatter, scatter_text, std_transitation, data_size, last_zoom_level = "";
+var svg, xAxis, yAxis, x, y, scaled_x, scaled_y, scatter, scatter_text, std_transitation, data_size, last_zoom_level, font_size = "";
 const TRANSITION_DURATION = 4000;
 const CIRCLE_STD_RADIUS = 7.5;
 const CIRCLE_HIGHLIGHT_RADIUS = 12;
@@ -114,10 +114,11 @@ function updatePositionOnZoom() {
         var value = zoom_level_scaled
         var base = 2
         var loged = Math.log(value + 1) / Math.log(base)
+        font_size = 14 + (1 - loged) * 6
         // var loged = 1
         zoom_filter_value = data_size - Math.floor(loged * data_size) + 1
 
-        console.log("zoom factor " + current_zoom_level + " loged: " + loged + "zoom factor filter value: " + zoom_filter_value)
+        console.log("zoom factor " + current_zoom_level + " loged: " + loged + " zoom factor filter value: " + zoom_filter_value)
 
         scatter
             .selectAll("text.song_text")
@@ -130,7 +131,8 @@ function updatePositionOnZoom() {
                 } else {
                     return "none"
                 }
-            });
+            })
+            .style("font-size", font_size + "px")
 
     }
 
@@ -206,14 +208,14 @@ function draw_data() {
                 })
                 .attr("y", function (d) {
                     return y(d["1"]);
-                }),
+                })
+                .style("font-size", "14px"),
             update => update
                 .call(update => update.transition(std_transitationFactory())
                     .attr("x", function (d) { return scaled_x(d["0"]); })
                     .attr("y", function (d) { return scaled_y(d["0"]); })
                 )
         )
-        .style("font-size", "14px")
         .classed("song_text", function (d) { return d.type == "song" })
         .classed("playlist_text", function (d) { return d.type == "playlist" })
 }
