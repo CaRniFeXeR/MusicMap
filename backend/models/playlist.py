@@ -6,8 +6,9 @@ import pandas as pd
 
 class Playlist:
 
-    def __init__(self, name: str = "", description: str = "", **kwargs) -> None:
+    def __init__(self, name: str = "", description: str = "", uri : str = "", **kwargs) -> None:
         self.name = name
+        self.uri = uri
         self.description = description
         self.tracks: List[Track] = []
 
