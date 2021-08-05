@@ -3,7 +3,7 @@ from typing import List
 
 class MusicFeatures:
 
-    def __init__(self, danceability: float = None, energy: float = None, loudness: float = None, speechiness: float = None,  acousticness: float = None, instrumentalness: float = None, liveness: float = None, valence: float = None, tempo: float = None, **kwargs) -> None:
+    def __init__(self, danceability: float = None, energy: float = None, loudness: float = None, speechiness: float = None,  acousticness: float = None, instrumentalness: float = None, liveness: float = None, valence: float = None, tempo: float = None, mode: int = None, **kwargs) -> None:
         self.danceability = danceability
         self.energy = energy
         self.loudness = loudness
@@ -12,7 +12,8 @@ class MusicFeatures:
         self.instrumentalness = instrumentalness
         self.liveness = liveness
         self.valence = valence
-        self.tempo = tempo  # excluded temp
+        self.tempo = tempo  # measured in Beats per Minute
+        self.mode = mode
 
     @property
     def feature_names(self) -> List[str]:
