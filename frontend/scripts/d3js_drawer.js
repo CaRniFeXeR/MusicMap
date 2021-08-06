@@ -204,16 +204,16 @@ function draw_data() {
                     return d.name;
                 })
                 .attr("x", function (d) {
-                    return x(d["0"]);
+                    return scaled_x(d["0"]);
                 })
                 .attr("y", function (d) {
-                    return y(d["1"]);
+                    return scaled_y(d["1"]);
                 })
                 .style("font-size", "14px"),
             update => update
                 .call(update => update.transition(std_transitationFactory())
                     .attr("x", function (d) { return scaled_x(d["0"]); })
-                    .attr("y", function (d) { return scaled_y(d["0"]); })
+                    .attr("y", function (d) { return scaled_y(d["1"]); })
                 )
         )
         .classed("song_text", function (d) { return d.type == "song" })
